@@ -1,0 +1,417 @@
+openapi: 3.0.0
+info:
+  title: Bank Account Service
+  description: API to manage bank accounts.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local server
+
+paths:
+  /v1/accounts:
+    get:
+      summary: Get all accounts
+      operationId: getAllAccounts
+      responses:
+        '200':
+          description: List of accounts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccountResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      summary: Create a new account
+      operationId: createAccount
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountRequest'
+      responses:
+        '201':
+          description: Account created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/accounts/{accountId}:
+    get:
+      summary: Get an account by ID
+      operationId: getAccountById
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Id of account
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Account found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      summary: Update an account by ID
+      operationId: updateAccount
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Id of account
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountRequest'
+      responses:
+        '200':
+          description: Account updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: Delete an account by ID
+      operationId: deleteAccount
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Id of account
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Account deleted
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/accounts/{accountId}/withdrawal:
+    post:
+      summary: Make a withdraw from an account
+      operationId: withdrawFromAccount
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Id of account
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+      responses:
+        '200':
+          description: Withdrawal made
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Insufficient funds
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/accounts/{accountId}/deposit:
+    post:
+      summary: Make a deposit to an account
+      operationId: depositToAccount
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Id of account
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+      responses:
+        '200':
+          description: Deposit made
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Insufficient deposit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/account/{accountId}/balances:
+    get:
+      summary: Get client balances
+      operationId: getClientBalances
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Client balances
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalanceResponse'
+        '404':
+          description: Client not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/account/{accountId}/transactions:
+    get:
+      summary: Get client transactions
+      operationId: getClientTransactions
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of Transactions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransactionResponse'
+        '404':
+          description: Client not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    AccountRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [savings, checking, fixed term]
+        balance:
+          type: number
+        currency:
+          type: string
+        isActive:
+          type: boolean
+        movementLimit:
+          type: integer
+        maintenanceFee:
+          type: number
+        transactionDay:
+          type: string
+          format: date
+          example: 2024-12-01
+        clientId:
+          type: string
+      required:
+        - type
+        - clientId
+        - isActive
+        - currency
+    AccountResponse:
+      type: object
+      properties:
+        _id:
+          type: string
+        type:
+          type: string
+          enum: [savings, checking, fixed term]
+        balance:
+          type: object
+        accountNumber:
+          type: string
+        createdDate:
+          type: string
+          format: date-time
+        movementLimit:
+          type: number
+        maintenanceFee:
+          type: number
+        clientId:
+          type: string
+        transactionDay:
+          type: string
+          format: date
+        holders:
+          type: array
+          items:
+            type: string
+        authorizedSigners:
+          type: array
+          items:
+            type: string
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transaction'
+    Transaction:
+      type: object
+      properties:
+        clientId:
+          type: string
+        type:
+          type: string
+          enum: [deposit, withdrawal]
+        amount:
+          type: number
+        date:
+          type: string
+          format: date
+        description:
+          type: string
+    TransactionRequest:
+      type: object
+      required:
+        - bankAccountId
+        - clientId
+        - amount
+      properties:
+        bankAccountId:
+          type: string
+        type:
+          type: string
+          enum: [ deposit,withdrawal ]
+        amount:
+          type: number
+          format: double
+        description:
+          type: string
+        clientId:
+          type: string
+        balance:
+          type: number
+          format: double
+    TransactionResponse:
+      type: object
+      required:
+        - clientId
+        - bankAccountId
+      properties:
+        bankAccountId:
+          type: string
+        type:
+          type: string
+          enum: [ deposit,withdrawal ]
+        amount:
+          type: number
+        clientId:
+          type: string
+    BalanceResponse:
+      type: object
+      properties:
+        clientId:
+          type: string
+        accountBalance:
+          type: number
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
