@@ -367,11 +367,11 @@ components:
     TransactionRequest:
       type: object
       required:
-        - bankAccountId
+        - productId
         - clientId
         - amount
       properties:
-        bankAccountId:
+        productId:
           type: string
         type:
           type: string
@@ -390,9 +390,9 @@ components:
       type: object
       required:
         - clientId
-        - bankAccountId
+        - productId
       properties:
-        bankAccountId:
+        productId:
           type: string
         type:
           type: string
