@@ -3,14 +3,12 @@ package com.sgi.bank_account_back.infrastructure.mapper;
 import com.sgi.bank_account_back.domain.model.BankAccount;
 import com.sgi.bank_account_back.infrastructure.dto.AccountRequest;
 import com.sgi.bank_account_back.infrastructure.dto.AccountResponse;
-import com.sgi.bank_account_back.domain.model.Balance;
 import com.sgi.bank_account_back.infrastructure.dto.BalanceResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 import reactor.core.publisher.Mono;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;

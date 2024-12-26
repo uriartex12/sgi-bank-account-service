@@ -148,6 +148,7 @@
 							<generateSupportingFiles>true</generateSupportingFiles>
 							<configOptions>
 								<reactive>true</reactive>
+								<useLombok>true</useLombok>
 								<openApiNullable>true</openApiNullable>
 								<interfaceOnly>true</interfaceOnly>
 								<useSpringBoot3>true</useSpringBoot3>

@@ -302,6 +302,14 @@ components:
           type: integer
         maintenanceFee:
           type: number
+        authorizedSigners:
+          type: array
+          items:
+            type: string
+        holders:
+          type: array
+          items:
+            type: string
         transactionDay:
           type: string
           format: date
@@ -345,25 +353,6 @@ components:
           type: array
           items:
             type: string
-        transactions:
-          type: array
-          items:
-            $ref: '#/components/schemas/Transaction'
-    Transaction:
-      type: object
-      properties:
-        clientId:
-          type: string
-        type:
-          type: string
-          enum: [deposit, withdrawal]
-        amount:
-          type: number
-        date:
-          type: string
-          format: date
-        description:
-          type: string
     TransactionRequest:
       type: object
       required:
@@ -410,8 +399,39 @@ components:
           type: number
     ErrorResponse:
       type: object
+      required:
+        - status
+        - code
+        - message
+        - timestamp
       properties:
-        error:
+        status:
+          type: int
+        code:
           type: string
         message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+    CustomerResponse:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+          enum: [ PERSONAL, BUSINESS ]
+        documentId:
+          type: string
+        phoneNumber:
+          type: string
+        email:
+          type: string
+        address:
           type: string

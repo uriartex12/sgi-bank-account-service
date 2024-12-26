@@ -8,6 +8,9 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -20,13 +23,13 @@ import java.util.List;
 @Document(collection = "bank-account")
 @CompoundIndex(def = "{'id': 1, 'accountNumber': 1}", name = "id_accountNumber_index", unique = true)
 public class BankAccount {
-
     @Id
     private String id;
     private String accountNumber;
     private String type;
     private String clientId;
     private Balance accountBalance;
+    @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal maintenanceFee;
     private Integer movementLimit;
     private Integer movementsUsed;
