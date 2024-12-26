@@ -2,6 +2,7 @@ package com.sgi.bank_account_back.infrastructure.controller;
 
 import com.sgi.bank_account_back.domain.ports.in.BankAccountService;
 import com.sgi.bank_account_back.infrastructure.dto.*;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,13 +11,10 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
+@AllArgsConstructor
 public class BanckAccountController implements V1Api{
 
     private final BankAccountService bankAccountService;
-
-    public BanckAccountController(BankAccountService bankAccountService) {
-        this.bankAccountService = bankAccountService;
-    }
 
     @Override
     public Mono<ResponseEntity<AccountResponse>> createAccount(Mono<AccountRequest> accountRequest, ServerWebExchange exchange){

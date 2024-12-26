@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 @AllArgsConstructor
 public enum CustomError {
+
     E_OPERATION_FAILED(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, "ACCOUNT-000", "Operation failed")),
     E_INVALID_INPUT(new ApiError(HttpStatus.BAD_REQUEST, "ACCOUNT-100", "Invalid input provided")),
     E_ACCOUNT_NOT_FOUND(new ApiError(HttpStatus.NOT_FOUND, "ACCOUNT-001", "Bank account not found")),

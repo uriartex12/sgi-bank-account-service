@@ -49,6 +49,7 @@ public class ValidationBankAccountImpl implements ValidationBankAccount {
                         return Mono.just(account);
                     });
         }
+        account.setMovementLimit(null);
         return Mono.just(account);
     }
 
