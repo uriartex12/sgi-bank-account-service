@@ -5,10 +5,10 @@ import com.sgi.bank_account_back.domain.model.Balance;
 import com.sgi.bank_account_back.domain.model.BankAccount;
 import com.sgi.bank_account_back.domain.ports.in.BankAccountService;
 import com.sgi.bank_account_back.domain.ports.out.BankAccountRepository;
+import com.sgi.bank_account_back.domain.ports.out.FeignExternalService;
 import com.sgi.bank_account_back.infrastructure.dto.*;
 import com.sgi.bank_account_back.domain.shared.CustomError;
 import com.sgi.bank_account_back.infrastructure.exception.CustomException;
-import com.sgi.bank_account_back.infrastructure.feign.FeignExternalServiceImpl;
 import com.sgi.bank_account_back.infrastructure.mapper.BankAccountMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,7 +31,7 @@ public class BankAccountServiceImpl implements BankAccountService {
     String customerServiceUrl;
 
     private final BankAccountRepository bankAccountRepository;
-    private final FeignExternalServiceImpl webClient;
+    private final FeignExternalService webClient;
     private final ValidationBankAccount validateSavingsAccount;
 
     @Override
