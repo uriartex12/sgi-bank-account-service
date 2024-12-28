@@ -4,10 +4,10 @@ app:
   description: @project.description@
 spring:
   application:
-    name: sgi-bank-account_back
+    name: @project.name@
   cloud:
     config:
-      name: sgi-bank-account_back
+      name: @project.name@
       profile: ${PROFILE:dev}
   config:
     import: optional:configserver:${CONFIG_SERVER_URI:http://localhost:8888}

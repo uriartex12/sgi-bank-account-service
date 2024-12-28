@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.sgi</groupId>
-	<artifactId>sgi-bank-account_back</artifactId>
+	<artifactId>account-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>sgi-bank-account_back</name>
+	<name>sgi-account-service</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>
@@ -96,9 +96,46 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.12</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>prepare-agent</goal>
+							<goal>report</goal>
+							<goal>check</goal>
+						</goals>
+						<configuration>
+							<excludes>
+								<exclude>**/Application*</exclude>
+								<exclude>**/*MapperImpl*</exclude>
+								<exclude>**/mappers/*</exclude>
+								<exclude>**/domain/model/**</exclude>
+							</excludes>
+						</configuration>
+					</execution>
+				</executions>
+				<configuration>
+					<rules>
+						<rule>
+							<element>PACKAGE</element>
+							<!--element>BUNDLE</element-->
+							<limits>
+								<limit>
+									<!--counter>LINE</counter-->
+									<counter>INSTRUCTION</counter>
+									<value>COVEREDRATIO</value>
+									<minimum>0%</minimum>
+								</limit>
+							</limits>
+						</rule>
+					</rules>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -133,6 +170,36 @@
 				</configuration>
 			</plugin>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>3.1.2</version>
+				<configuration>
+					<configLocation>checkstyle.xml</configLocation>
+					<encoding>UTF-8</encoding>
+					<consoleOutput>true</consoleOutput>
+					<linkXRef>false</linkXRef>
+					<includeTestSourceDirectory>true</includeTestSourceDirectory>
+					<logViolationsToConsole>true</logViolationsToConsole>
+					<violationSeverity>warning</violationSeverity>
+				</configuration>
+				<executions>
+					<execution>
+						<id>validate</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>com.puppycrawl.tools</groupId>
+						<artifactId>checkstyle</artifactId>
+						<version>10.9.1</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+			<plugin>
 				<groupId>org.openapitools</groupId>
 				<artifactId>openapi-generator-maven-plugin</artifactId>
 				<version>${openapi-generator.version}</version>
@@ -154,8 +221,8 @@
 								<useSpringBoot3>true</useSpringBoot3>
 								<skipDefaultInterface>true</skipDefaultInterface>
 								<library>spring-boot</library>
-								<apiPackage>${project.groupId}.bank-account_back.infrastructure.controller</apiPackage>
-								<modelPackage>${project.groupId}.bank-account_back.infrastructure.dto</modelPackage>
+								<apiPackage>${project.groupId}.account.infrastructure.controller</apiPackage>
+								<modelPackage>${project.groupId}.account.infrastructure.dto</modelPackage>
 								<supportingFilesToGenerate>ApiUtil.java</supportingFilesToGenerate>
 							</configOptions>
 						</configuration>
@@ -164,5 +231,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>
