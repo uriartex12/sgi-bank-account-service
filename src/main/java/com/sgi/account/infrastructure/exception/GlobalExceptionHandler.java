@@ -1,5 +1,5 @@
 package com.sgi.account.infrastructure.exception;
-/*
+
 import com.sgi.account.infrastructure.dto.ErrorResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -14,7 +14,7 @@ import java.time.ZoneOffset;
  * GlobalExceptionHandler maneja las excepciones personalizadas en la aplicación.
  * Utiliza @ControllerAdvice para interceptar las excepciones lanzadas y generar respuestas de error adecuadas.
  */
-/*@ControllerAdvice
+@ControllerAdvice
 public class GlobalExceptionHandler {
 
     /**
@@ -23,7 +23,7 @@ public class GlobalExceptionHandler {
      * @param ex Excepción personalizada.
      * @return Mono que encapsula la respuesta de error.
      */
-    /*@ExceptionHandler(CustomException.class)
+    @ExceptionHandler(CustomException.class)
     public Mono<ResponseEntity<ErrorResponse>> handleCustomException(CustomException ex) {
         return Mono.just(ResponseEntity
                 .status(ex.getStatus())
@@ -36,9 +36,9 @@ public class GlobalExceptionHandler {
      * @param ex Excepción personalizada.
      * @return Un objeto ErrorResponse con los detalles del error.
      */
-    /*private ErrorResponse createErrorResponse(CustomException ex) {
+    private ErrorResponse createErrorResponse(CustomException ex) {
         LocalDateTime localDateTime = ex.getTimestamp();
         OffsetDateTime offsetDateTime = localDateTime.atOffset(ZoneOffset.UTC);
         return new ErrorResponse(ex.getStatus(), ex.getCode(), ex.getMessage(), offsetDateTime);
     }
-}*/
+}

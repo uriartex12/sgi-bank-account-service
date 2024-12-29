@@ -6,7 +6,7 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 /**
- * Enum representing custom errors for the Credit-service application.
+ * Enum representing custom errors for the Bank-Account-service application.
  * Each constant includes an error code, message, and HTTP status for specific errors.
  */
 @Getter

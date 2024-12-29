@@ -13,27 +13,27 @@ public interface BankAccountRepository {
      * Saves a Account in the repository.
      *
      * @param bankAccount the credit information to save
-     * @return a Mono containing the saved credit response
+     * @return a Mono containing the saved account response
      */
     Mono<AccountResponse> save(BankAccount bankAccount);
 
     /**
-     * Finds a credit by its ID.
+     * Finds a account by its ID.
      *
      * @param id the unique identifier of the account
-     * @return a Mono containing the found Cccount or empty if not found
+     * @return a Mono containing the found Account or empty if not found
      */
     Mono<BankAccount> findById(String id);
 
     /**
      * Retrieves all available accounts.
      *
-     * @return a Flux containing all credit responses
+     * @return a Flux containing all account responses
      */
     Flux<AccountResponse> findAll();
 
     /**
-     * Deletes a credit from the repository.
+     * Deletes a account from the repository.
      *
      * @param bankAccount the account information to delete
      * @return a Mono representing the deletion operation
