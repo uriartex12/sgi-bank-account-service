@@ -8,7 +8,7 @@ servers:
     description: Local server
 
 paths:
-  /v1/accounts:
+  /v1/account:
     get:
       summary: Get all accounts
       operationId: getAllAccounts
@@ -55,7 +55,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /v1/accounts/{accountId}:
+  /v1/account/{accountId}:
     get:
       summary: Get an account by ID
       operationId: getAccountById
@@ -151,7 +151,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /v1/accounts/{accountId}/withdrawal:
+  /v1/account/{accountId}/withdrawal:
     post:
       summary: Make a withdraw from an account
       operationId: withdrawFromAccount
@@ -187,7 +187,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /v1/accounts/{accountId}/deposit:
+  /v1/account/{accountId}/deposit:
     post:
       summary: Make a deposit to an account
       operationId: depositToAccount
