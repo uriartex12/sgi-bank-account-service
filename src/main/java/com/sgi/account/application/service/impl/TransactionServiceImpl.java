@@ -6,6 +6,11 @@ import com.sgi.account.domain.ports.in.TransactionService;
 import com.sgi.account.domain.ports.out.BankAccountRepository;
 import com.sgi.account.domain.ports.out.FeignExternalService;
 import com.sgi.account.domain.shared.CustomError;
+import com.sgi.account.infrastructure.dto.DepositRequest;
+import com.sgi.account.infrastructure.dto.TransactionRequest;
+import com.sgi.account.infrastructure.dto.TransactionResponse;
+import com.sgi.account.infrastructure.dto.WithdrawalRequest;
+import com.sgi.account.infrastructure.dto.TransferRequest;
 import com.sgi.account.infrastructure.exception.CustomException;
 import com.sgi.account.infrastructure.mapper.TransactionExternalMapper;
 import lombok.RequiredArgsConstructor;
@@ -63,11 +68,7 @@ public class TransactionServiceImpl implements TransactionService {
                             .currency(account.getAccountBalance().getCurrency())
                             .build());
                     return bankAccountRepository.save(account)
-                            .flatMap(savedAccount -> webClient.post(
-                                    transactionServiceUrl.concat("/v1/transaction"),
-                                    transaction,
-                                    TransactionResponse.class
-                            ));
+                            .flatMap(savedAccount -> postTransaction(transaction));
                 }));
     }
 
@@ -94,11 +95,7 @@ public class TransactionServiceImpl implements TransactionService {
                                     .currency(account.getAccountBalance().getCurrency())
                                     .build());
                             return bankAccountRepository.save(account)
-                                    .flatMap(savedAccount -> webClient.post(
-                                            transactionServiceUrl.concat("/v1/transaction"),
-                                            transaction,
-                                            TransactionResponse.class
-                                    ));
+                                    .flatMap(savedAccount -> postTransaction(transaction));
                         }));
     }
 
@@ -114,30 +111,33 @@ public class TransactionServiceImpl implements TransactionService {
                         .flatMap(transfer -> bankAccountRepository.findById(transfer.getDestinationProductId())
                                 .switchIfEmpty(Mono.defer(() -> Mono.error(new CustomException(CustomError.E_ACCOUNT_NOT_FOUND))))
                                 .flatMap(accountDestination -> {
-                                    BigDecimal updatedBalanceWithdrawal = account.getAccountBalance().getBalance()
-                                            .subtract(BigDecimal.valueOf(transfer.getAmount()));
-                                    BigDecimal updatedBalanceDeposit = accountDestination.getAccountBalance().getBalance()
-                                            .add(BigDecimal.valueOf(transfer.getAmount()));
-
+                                    BigDecimal originalBalanceSource = account.getAccountBalance().getBalance();
+                                    BigDecimal originalBalanceDestination = accountDestination.getAccountBalance().getBalance();
                                     TransactionRequest transactionWithdrawal = createTransaction(account,
                                             transfer.getDestinationProductId(),
-                                            WITHDRAWAL, updatedBalanceWithdrawal,
+                                            WITHDRAWAL, originalBalanceSource.subtract(BigDecimal.valueOf(transfer.getAmount())),
                                             BigDecimal.valueOf(transfer.getAmount()));
                                     TransactionRequest transactionDeposit = createTransaction(accountDestination,
-                                            account.getId(), DEPOSIT,
-                                            updatedBalanceDeposit,
+                                            account.getId(), DEPOSIT, originalBalanceDestination
+                                                    .add(BigDecimal.valueOf(transfer.getAmount())),
                                             BigDecimal.valueOf(transfer.getAmount()));
 
-                                    updateAccountBalance(account, updatedBalanceWithdrawal);
-                                    updateAccountBalance(accountDestination, updatedBalanceDeposit);
-
+                                    updateAccountBalance(account, BigDecimal.valueOf(transactionWithdrawal.getBalance()));
+                                    updateAccountBalance(accountDestination, BigDecimal.valueOf(transactionDeposit.getBalance()));
                                     return bankAccountRepository.saveAll(Flux.just(account, accountDestination))
-                                            .then()
-                                            .flatMap(accountResponse ->
-                                                    Flux.merge(postTransaction(transactionWithdrawal),
+                                            .collectList()
+                                            .flatMap(savedAccounts ->
+                                                    Flux.zip(postTransaction(transactionWithdrawal),
                                                                     postTransaction(transactionDeposit))
-                                                            .last())
+                                                            .next()
+                                                            .map(results ->
+                                                                    new TransactionResponse(results.getT1().getProductId(),
+                                                                            results.getT2().getProductId(), results.getT1().getType(),
+                                                                            results.getT1().getAmount(), results.getT1().getClientId()))
+                                            )
                                             .onErrorResume(e -> {
+                                                updateAccountBalance(account, originalBalanceSource);
+                                                updateAccountBalance(accountDestination, originalBalanceDestination);
                                                 return bankAccountRepository.saveAll(Flux.just(account, accountDestination))
                                                         .then(Mono.error(new CustomException(CustomError.E_OPERATION_FAILED)));
                                             });
@@ -157,7 +157,8 @@ public class TransactionServiceImpl implements TransactionService {
                 .build());
     }
 
-    private TransactionRequest createTransaction(BankAccount account, String destinationProductId,
+    private TransactionRequest createTransaction(BankAccount account,
+                                                 String destinationProductId,
                                                  TransactionRequest.TypeEnum type,
                                                  BigDecimal updatedBalance, BigDecimal amount) {
         return TransactionExternalMapper.INSTANCE.map(account, destinationProductId, amount, type, updatedBalance);

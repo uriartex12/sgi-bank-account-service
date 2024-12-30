@@ -441,8 +441,11 @@ components:
     TransactionResponse:
       type: object
       required:
-        - clientId
         - productId
+        - destinationProductId
+        - type
+        - amount
+        - clientId
       properties:
         productId:
           type: string
