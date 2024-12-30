@@ -167,7 +167,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TransactionRequest'
+              $ref: '#/components/schemas/WithdrawalRequest'
       responses:
         '200':
           description: Withdrawal made
@@ -203,7 +203,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TransactionRequest'
+              $ref: '#/components/schemas/DepositRequest'
       responses:
         '200':
           description: Deposit made
@@ -219,6 +219,42 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '400':
           description: Insufficient deposit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/account/{accountId}/transfer:
+    post:
+      summary: Make a transfer to an account
+      operationId: transferToAccount
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Id of account
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferRequest'
+      responses:
+        '200':
+          description: Deposit made
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Insufficient balance
           content:
             application/json:
               schema:
@@ -353,6 +389,33 @@ components:
           type: array
           items:
             type: string
+    TransferRequest:
+      type: object
+      required:
+        - amount
+        - destinationProductId
+      properties:
+        destinationProductId:
+          type: string
+        amount:
+          type: number
+          format: double
+    WithdrawalRequest:
+      type: object
+      required:
+        - amount
+      properties:
+        amount:
+          type: number
+          format: double
+    DepositRequest:
+      type: object
+      required:
+        - amount
+      properties:
+        amount:
+          type: number
+          format: double
     TransactionRequest:
       type: object
       required:
@@ -362,14 +425,14 @@ components:
       properties:
         productId:
           type: string
+        destinationProductId:
+          type: string
         type:
           type: string
-          enum: [ deposit,withdrawal ]
+          enum: [ DEPOSIT , WITHDRAWAL]
         amount:
           type: number
           format: double
-        description:
-          type: string
         clientId:
           type: string
         balance:
@@ -383,9 +446,11 @@ components:
       properties:
         productId:
           type: string
+        destinationProductId:
+          type: string
         type:
           type: string
-          enum: [ deposit,withdrawal ]
+          enum: [ DEPOSIT , WITHDRAWAL]
         amount:
           type: number
         clientId:
@@ -414,7 +479,7 @@ components:
         timestamp:
           type: string
           format: date-time
-    CustomerResponse:
+    Customer:
       type: object
       required:
         - id
@@ -427,6 +492,9 @@ components:
         type:
           type: string
           enum: [ PERSONAL, BUSINESS ]
+        profile:
+          type: string
+          enum: [ VIP, PYME ]
         documentId:
           type: string
         phoneNumber:
@@ -435,3 +503,26 @@ components:
           type: string
         address:
           type: string
+    Credit:
+      type: object
+      properties:
+        _id:
+          type: string
+        creditNumber:
+          type: string
+        type:
+          type: string
+          enum: [ PERSONAL, BUSINESS ]
+        creditLimit:
+          type: decimal
+        consumptionAmount:
+          type: decimal
+        balance:
+          type: decimal
+        interestRate:
+          type: decimal
+        clientId:
+          type: string
+        createdDate:
+          type: string
+          format: date-time

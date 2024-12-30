@@ -29,6 +29,12 @@ public class BankAccountRepositoryImpl implements BankAccountRepository {
     }
 
     @Override
+    public Flux<AccountResponse> saveAll(Flux<BankAccount> bankAccounts) {
+        return repositoryJpa.saveAll(bankAccounts)
+                .map(BankAccountMapper.INSTANCE::toAccountResponse);
+    }
+
+    @Override
     public Mono<BankAccount> findById(String id) {
         return repositoryJpa.findById(id);
     }

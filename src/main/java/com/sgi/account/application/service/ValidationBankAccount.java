@@ -1,6 +1,7 @@
 package com.sgi.account.application.service;
 
 import com.sgi.account.infrastructure.dto.AccountRequest;
+import com.sgi.account.infrastructure.dto.Customer;
 import reactor.core.publisher.Mono;
 
 /**
@@ -8,7 +9,7 @@ import reactor.core.publisher.Mono;
  * Provides methods to validate savings, checking, and fixed-term accounts.
  */
 public interface ValidationBankAccount {
-    Mono<AccountRequest> savingsAccount(AccountRequest account, String customerType);
-    Mono<AccountRequest> checkingAccount(AccountRequest account, String customerType);
-    Mono<AccountRequest> fixedTermAccount(AccountRequest account, String customerType);
+    Mono<AccountRequest> savingsAccount(AccountRequest account, Customer customer);
+    Mono<AccountRequest> checkingAccount(AccountRequest account, Customer customer);
+    Mono<AccountRequest> fixedTermAccount(AccountRequest account, Customer customer);
 }
