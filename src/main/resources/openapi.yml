@@ -338,6 +338,8 @@ components:
           type: integer
         maintenanceFee:
           type: number
+        commissionFee:
+          type: number
         authorizedSigners:
           type: array
           items:
@@ -375,6 +377,8 @@ components:
         movementLimit:
           type: number
         maintenanceFee:
+          type: number
+        commissionFee:
           type: number
         clientId:
           type: string
@@ -435,6 +439,9 @@ components:
           format: double
         clientId:
           type: string
+        commission:
+          type: number
+          format: double
         balance:
           type: number
           format: double

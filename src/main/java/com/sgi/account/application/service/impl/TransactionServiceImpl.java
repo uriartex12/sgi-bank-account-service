@@ -11,6 +11,7 @@ import com.sgi.account.infrastructure.dto.TransactionRequest;
 import com.sgi.account.infrastructure.dto.TransactionResponse;
 import com.sgi.account.infrastructure.dto.WithdrawalRequest;
 import com.sgi.account.infrastructure.dto.TransferRequest;
+import com.sgi.account.infrastructure.dto.AccountRequest;
 import com.sgi.account.infrastructure.exception.CustomException;
 import com.sgi.account.infrastructure.mapper.TransactionExternalMapper;
 import lombok.RequiredArgsConstructor;
@@ -54,19 +55,27 @@ public class TransactionServiceImpl implements TransactionService {
     public Mono<TransactionResponse> depositToAccount(String idAccount, Mono<DepositRequest> depositRequest) {
         return bankAccountRepository.findById(idAccount)
                 .switchIfEmpty(Mono.defer(() -> Mono.error(new CustomException(CustomError.E_ACCOUNT_NOT_FOUND))))
-                .flatMap(account -> depositRequest.flatMap(deposit -> {
-                    BigDecimal currentBalance = account.getAccountBalance().getBalance()
-                            .add(BigDecimal.valueOf(deposit.getAmount()));
-                    TransactionRequest transaction = new TransactionRequest();
-                    transaction.setProductId(idAccount);
-                    transaction.setAmount(deposit.getAmount());
-                    transaction.setType(TransactionRequest.TypeEnum.DEPOSIT);
-                    transaction.setClientId(account.getClientId());
-                    transaction.setBalance(currentBalance.doubleValue());
-                    account.setAccountBalance(Balance.builder()
-                            .balance(currentBalance)
-                            .currency(account.getAccountBalance().getCurrency())
-                            .build());
+                .flatMap(account -> depositRequest
+                        .filter(deposit -> account.getAccountBalance().getBalance()
+                                .add(BigDecimal.valueOf(deposit.getAmount()))
+                                .compareTo(calculateCommission(account)) >= 0)
+                        .switchIfEmpty(Mono.error(new CustomException(CustomError.E_INSUFFICIENT_BALANCE)))
+                        .flatMap(deposit -> {
+                            BigDecimal commission = calculateCommission(account);
+                            BigDecimal currentBalance = account.getAccountBalance().getBalance()
+                                    .add(BigDecimal.valueOf(deposit.getAmount()));
+                            TransactionRequest transaction = new TransactionRequest();
+                            transaction.setProductId(idAccount);
+                            transaction.setAmount(deposit.getAmount());
+                            transaction.setType(DEPOSIT);
+                            transaction.setClientId(account.getClientId());
+                            transaction.setBalance(currentBalance.subtract(commission).doubleValue());
+                            transaction.setCommission(commission.doubleValue());
+                            account.setMovementsUsed(account.getMovementsUsed() + 1);
+                            account.setAccountBalance(Balance.builder()
+                                    .balance(currentBalance.subtract(commission))
+                                    .currency(account.getAccountBalance().getCurrency())
+                                    .build());
                     return bankAccountRepository.save(account)
                             .flatMap(savedAccount -> postTransaction(transaction));
                 }));
@@ -79,15 +88,18 @@ public class TransactionServiceImpl implements TransactionService {
                 .switchIfEmpty(Mono.defer(() -> Mono.error(new CustomException(CustomError.E_ACCOUNT_NOT_FOUND))))
                 .flatMap(account -> withdrawalRequest
                         .filter(withdrawal -> account.getAccountBalance().getBalance()
-                                .compareTo(BigDecimal.valueOf(withdrawal.getAmount())) >= 0)
+                                .compareTo(BigDecimal.valueOf(withdrawal.getAmount()).add(calculateCommission(account))) >= 0)
                         .switchIfEmpty(Mono.error(new CustomException(CustomError.E_INSUFFICIENT_BALANCE)))
                         .flatMap(withdrawal -> {
+                            BigDecimal commission = calculateCommission(account);
                             BigDecimal updatedBalance = account.getAccountBalance().getBalance()
+                                    .subtract(commission)
                                     .subtract(BigDecimal.valueOf(withdrawal.getAmount()));
                             TransactionRequest transaction = new TransactionRequest();
                             transaction.setProductId(idAccount);
                             transaction.setAmount(withdrawal.getAmount());
-                            transaction.setType(TransactionRequest.TypeEnum.WITHDRAWAL);
+                            transaction.setType(WITHDRAWAL);
+                            transaction.setCommission(commission.doubleValue());
                             transaction.setClientId(account.getClientId());
                             transaction.setBalance(updatedBalance.doubleValue());
                             account.setAccountBalance(Balance.builder()
@@ -155,6 +167,19 @@ public class TransactionServiceImpl implements TransactionService {
                 .balance(updatedBalance)
                 .currency(account.getAccountBalance().getCurrency())
                 .build());
+    }
+
+    private BigDecimal calculateCommission(BankAccount account) {
+        BigDecimal commissionFee = account.getCommissionFee() != null
+                ? account.getCommissionFee()
+                : BigDecimal.ZERO;
+        return switch (AccountRequest.TypeEnum.valueOf(account.getType())) {
+            case SAVINGS -> account.getMovementsUsed() >= account.getMovementLimit()
+                    ? commissionFee
+                    : BigDecimal.ZERO;
+            case CHECKING -> account.getMaintenanceFee();
+            case FIXED_TERM -> BigDecimal.ZERO;
+        };
     }
 
     private TransactionRequest createTransaction(BankAccount account,

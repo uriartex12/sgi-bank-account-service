@@ -10,29 +10,17 @@ import com.sgi.account.domain.shared.CustomError;
 import com.sgi.account.infrastructure.dto.AccountRequest;
 import com.sgi.account.infrastructure.dto.AccountResponse;
 import com.sgi.account.infrastructure.dto.BalanceResponse;
-import com.sgi.account.infrastructure.dto.TransactionRequest;
-import com.sgi.account.infrastructure.dto.TransactionResponse;
-import com.sgi.account.infrastructure.dto.DepositRequest;
-import com.sgi.account.infrastructure.dto.WithdrawalRequest;
 import com.sgi.account.infrastructure.dto.Customer;
-import com.sgi.account.infrastructure.dto.TransferRequest;
 import com.sgi.account.infrastructure.exception.CustomException;
 import com.sgi.account.infrastructure.mapper.BankAccountMapper;
-import com.sgi.account.infrastructure.mapper.TransactionExternalMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Random;
-
-import static com.sgi.account.infrastructure.dto.TransactionRequest.TypeEnum;
-import static com.sgi.account.infrastructure.dto.TransactionRequest.TypeEnum.DEPOSIT;
-import static com.sgi.account.infrastructure.dto.TransactionRequest.TypeEnum.WITHDRAWAL;
-
 
 /**
  * Service implementation for managing Bank Account.
@@ -68,6 +56,7 @@ public class BankAccountServiceImpl implements BankAccountService {
                                             bankAccount.setAccountNumber(generateAccountNumber());
                                             bankAccount.setCreatedDate(Instant.now());
                                             bankAccount.setUpdatedDate(Instant.now());
+                                            bankAccount.setMovementsUsed(BigDecimal.ZERO.intValue());
                                             return bankAccountRepository.save(bankAccount);
                                         })
                                         .onErrorResume(e -> Mono.error(new Exception("Invalid account data", e)))

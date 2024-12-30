@@ -38,6 +38,8 @@ public class BankAccount {
     private Balance accountBalance;
     @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal maintenanceFee;
+    @Field(targetType = FieldType.DECIMAL128)
+    private BigDecimal commissionFee;
     private Integer movementLimit;
     private Integer movementsUsed;
     private Boolean isActive;
