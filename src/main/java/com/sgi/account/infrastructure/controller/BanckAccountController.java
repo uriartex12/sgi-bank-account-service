@@ -1,6 +1,7 @@
 package com.sgi.account.infrastructure.controller;
 
 import com.sgi.account.domain.ports.in.BankAccountService;
+import com.sgi.account.domain.ports.in.TransactionService;
 import com.sgi.account.infrastructure.dto.AccountRequest;
 import com.sgi.account.infrastructure.dto.AccountResponse;
 import com.sgi.account.infrastructure.dto.DepositRequest;
@@ -25,6 +26,8 @@ public class BanckAccountController implements V1Api {
 
     private final BankAccountService bankAccountService;
 
+    private final TransactionService transactionService;
+
     @Override
     public Mono<ResponseEntity<AccountResponse>> createAccount(Mono<AccountRequest> accountRequest, ServerWebExchange exchange) {
         return bankAccountService.createAccount(accountRequest)
@@ -42,7 +45,7 @@ public class BanckAccountController implements V1Api {
             String idAccount,
             Mono<DepositRequest> depositRequestMono,
             ServerWebExchange exchange) {
-        return bankAccountService.depositToAccount(idAccount, depositRequestMono)
+        return transactionService.depositToAccount(idAccount, depositRequestMono)
                 .map(bankAccount -> ResponseEntity.ok().body(bankAccount));
     }
 
@@ -67,7 +70,7 @@ public class BanckAccountController implements V1Api {
     public Mono<ResponseEntity<Flux<TransactionResponse>>> getClientTransactions(
             String accountId,
             ServerWebExchange exchange) {
-        return Mono.fromSupplier(() -> ResponseEntity.ok().body(bankAccountService.getClientTransactions(accountId)));
+        return Mono.fromSupplier(() -> ResponseEntity.ok().body(transactionService.getClientTransactions(accountId)));
     }
 
     @Override
@@ -75,7 +78,7 @@ public class BanckAccountController implements V1Api {
             String accountId,
             Mono<TransferRequest> transferRequest,
             ServerWebExchange exchange) {
-        return bankAccountService.transferFunds(accountId, transferRequest)
+        return transactionService.transferFunds(accountId, transferRequest)
                 .map(transactionResponse -> ResponseEntity.ok().body(transactionResponse));
     }
 
@@ -93,7 +96,7 @@ public class BanckAccountController implements V1Api {
             String idAccount,
             Mono<WithdrawalRequest> withdrawalRequestMono,
             ServerWebExchange exchange) {
-        return bankAccountService.withdrawFromAccount(idAccount, withdrawalRequestMono)
+        return transactionService.withdrawFromAccount(idAccount, withdrawalRequestMono)
                 .map(transactionResponse -> ResponseEntity.ok().body(transactionResponse));
     }
 }

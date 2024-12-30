@@ -25,16 +25,6 @@ public class FeignExternalServiceImpl implements FeignExternalService {
         this.webClient = webClientBuilder.build();
     }
 
-    /**
-     * Realiza una solicitud POST al servicio externo.
-     *
-     * @param url La URL del servicio.
-     * @param requestBody El cuerpo de la solicitud.
-     * @param responseType El tipo de la respuesta esperada.
-     * @param <T> Tipo del cuerpo de la solicitud.
-     * @param <R> Tipo de la respuesta.
-     * @return Mono que encapsula la respuesta.
-     */
     @Override
     public <T, R> Mono<R> post(String url, T requestBody, Class<R> responseType) {
         return webClient.post()
@@ -51,15 +41,6 @@ public class FeignExternalServiceImpl implements FeignExternalService {
                 });
     }
 
-    /**
-     * Realiza una solicitud GET al servicio externo.
-     *
-     * @param url La URL del servicio.
-     * @param pathVariable El valor de la variable de la URL.
-     * @param responseType El tipo de la respuesta esperada.
-     * @param <R> Tipo de la respuesta.
-     * @return Flux que encapsula la respuesta.
-     */
     @Override
     public <R> Flux<R> getFlux(String url, String pathVariable, Class<R> responseType) {
         return webClient.get()
@@ -73,15 +54,6 @@ public class FeignExternalServiceImpl implements FeignExternalService {
                         Flux.error(new CustomException(CustomError.E_OPERATION_FAILED)));
     }
 
-    /**
-     * Realiza una solicitud GET al servicio externo.
-     *
-     * @param url La URL del servicio.
-     * @param pathVariable El valor de la variable de la URL.
-     * @param responseType El tipo de la respuesta esperada.
-     * @param <R> Tipo de la respuesta.
-     * @return Mono que encapsula la respuesta.
-     */
     @Override
     public <R> Mono<R> getMono(String url, String pathVariable, Class<R> responseType) {
         return webClient.get()
