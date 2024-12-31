@@ -2,6 +2,7 @@ package com.sgi.account.infrastructure.controller;
 
 import com.sgi.account.domain.ports.in.BankAccountService;
 import com.sgi.account.domain.ports.in.TransactionService;
+import com.sgi.account.domain.shared.CustomError;
 import com.sgi.account.infrastructure.dto.AccountRequest;
 import com.sgi.account.infrastructure.dto.AccountResponse;
 import com.sgi.account.infrastructure.dto.DepositRequest;
@@ -9,6 +10,8 @@ import com.sgi.account.infrastructure.dto.TransactionResponse;
 import com.sgi.account.infrastructure.dto.BalanceResponse;
 import com.sgi.account.infrastructure.dto.TransferRequest;
 import com.sgi.account.infrastructure.dto.WithdrawalRequest;
+import com.sgi.account.infrastructure.exception.CustomException;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +32,7 @@ public class BanckAccountController implements V1Api {
     private final TransactionService transactionService;
 
     @Override
+    @CircuitBreaker(name = "account-service", fallbackMethod = "getAllAccounts")
     public Mono<ResponseEntity<AccountResponse>> createAccount(Mono<AccountRequest> accountRequest, ServerWebExchange exchange) {
         return bankAccountService.createAccount(accountRequest)
                 .map(bankAccount -> ResponseEntity.status(HttpStatus.CREATED).body(bankAccount));
@@ -58,6 +62,10 @@ public class BanckAccountController implements V1Api {
     @Override
     public Mono<ResponseEntity<Flux<AccountResponse>>> getAllAccounts(ServerWebExchange exchange) {
         return Mono.fromSupplier(() -> ResponseEntity.ok().body(bankAccountService.getAllAccounts()));
+    }
+
+    public CustomException getAllAccounts(Throwable throwable) {
+        return new CustomException(CustomError.E_INSUFFICIENT_BALANCE);
     }
 
     @Override

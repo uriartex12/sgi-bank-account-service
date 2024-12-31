@@ -63,6 +63,16 @@
 			<artifactId>mapstruct</artifactId>
 			<version>${map-struct.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<!-- Circuit Breaker -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-circuitbreaker-reactor-resilience4j</artifactId>
+			<version>1.0.2.RELEASE</version>
+		</dependency>
 		<!-- OpenApi generator dependencies -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
