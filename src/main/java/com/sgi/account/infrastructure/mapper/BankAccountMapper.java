@@ -7,7 +7,6 @@ import com.sgi.account.infrastructure.dto.BalanceResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
-import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
