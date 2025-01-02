@@ -14,4 +14,5 @@ public class Constants {
     public static String generateAccountNumber() {
         return String.format("%04d00%012d", new Random().nextInt(10000), new Random().nextLong(1000000000000L));
     }
+
 }

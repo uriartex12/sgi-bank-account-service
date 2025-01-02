@@ -71,7 +71,6 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-circuitbreaker-reactor-resilience4j</artifactId>
-			<version>1.0.2.RELEASE</version>
 		</dependency>
 		<!-- OpenApi generator dependencies -->
 		<dependency>
