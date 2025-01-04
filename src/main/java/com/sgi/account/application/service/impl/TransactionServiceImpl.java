@@ -40,7 +40,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final FeignExternalService webClient;
 
     @Override
-    public Flux<TransactionResponse> getClientTransactions(String idAccount) {
+    public Flux<TransactionResponse> getAccountIdTransactions(String idAccount) {
         return bankAccountRepository.findById(idAccount)
                 .switchIfEmpty(Mono.error(new CustomException(CustomError.E_ACCOUNT_NOT_FOUND)))
                 .flatMapMany(credit -> webClient.getFlux(
@@ -182,9 +182,7 @@ public class TransactionServiceImpl implements TransactionService {
         };
     }
 
-    private TransactionRequest createTransaction(BankAccount account,
-                                                 String destinationProductId,
-                                                 TransactionRequest.TypeEnum type,
+    private TransactionRequest createTransaction(BankAccount account, String destinationProductId, TransactionRequest.TypeEnum type,
                                                  BigDecimal updatedBalance, BigDecimal amount) {
         return TransactionExternalMapper.INSTANCE.map(account, destinationProductId, amount, type, updatedBalance);
     }

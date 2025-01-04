@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
  */
 public interface TransactionService {
 
-    Flux<TransactionResponse> getClientTransactions(String idAccount);
+    Flux<TransactionResponse> getAccountIdTransactions(String idAccount);
     Mono<TransactionResponse> depositToAccount(String idAccount, Mono<DepositRequest> depositRequestMono);
     Mono<TransactionResponse> transferFunds(String idAccount, Mono<TransferRequest> transferRequest);
     Mono<TransactionResponse> withdrawFromAccount(String idAccount, Mono<WithdrawalRequest> withdrawalRequestMono);

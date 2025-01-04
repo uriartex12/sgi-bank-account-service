@@ -2,7 +2,6 @@ package com.sgi.account.infrastructure.controller;
 
 import com.sgi.account.domain.ports.in.BankAccountService;
 import com.sgi.account.domain.ports.in.TransactionService;
-import com.sgi.account.domain.shared.CustomError;
 import com.sgi.account.infrastructure.dto.AccountRequest;
 import com.sgi.account.infrastructure.dto.AccountResponse;
 import com.sgi.account.infrastructure.dto.DepositRequest;
@@ -10,9 +9,8 @@ import com.sgi.account.infrastructure.dto.TransactionResponse;
 import com.sgi.account.infrastructure.dto.BalanceResponse;
 import com.sgi.account.infrastructure.dto.TransferRequest;
 import com.sgi.account.infrastructure.dto.WithdrawalRequest;
-import com.sgi.account.infrastructure.exception.CustomException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,18 +22,18 @@ import reactor.core.publisher.Mono;
  * Controller to handle operations related to credits.
  */
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class BanckAccountController implements V1Api {
 
     private final BankAccountService bankAccountService;
-
     private final TransactionService transactionService;
 
     @Override
     @CircuitBreaker(name = "account-service", fallbackMethod = "getAllAccounts")
     public Mono<ResponseEntity<AccountResponse>> createAccount(Mono<AccountRequest> accountRequest, ServerWebExchange exchange) {
         return bankAccountService.createAccount(accountRequest)
-                .map(bankAccount -> ResponseEntity.status(HttpStatus.CREATED).body(bankAccount));
+                .map(bankAccount
+                        -> ResponseEntity.status(HttpStatus.CREATED).body(bankAccount));
     }
 
     @Override
@@ -45,9 +43,7 @@ public class BanckAccountController implements V1Api {
     }
 
     @Override
-    public Mono<ResponseEntity<TransactionResponse>> depositToAccount(
-            String idAccount,
-            Mono<DepositRequest> depositRequestMono,
+    public Mono<ResponseEntity<TransactionResponse>> depositToAccount(String idAccount, Mono<DepositRequest> depositRequestMono,
             ServerWebExchange exchange) {
         return transactionService.depositToAccount(idAccount, depositRequestMono)
                 .map(bankAccount -> ResponseEntity.ok().body(bankAccount));
@@ -64,45 +60,32 @@ public class BanckAccountController implements V1Api {
         return Mono.fromSupplier(() -> ResponseEntity.ok().body(bankAccountService.getAllAccounts()));
     }
 
-    public CustomException getAllAccounts(Throwable throwable) {
-        return new CustomException(CustomError.E_INSUFFICIENT_BALANCE);
-    }
-
     @Override
     public Mono<ResponseEntity<BalanceResponse>> getClientBalances(String idAccount, ServerWebExchange exchange) {
-        return bankAccountService.getClientBalances(idAccount)
-                .map(balance -> ResponseEntity.ok().body(balance));
+        return bankAccountService.getClientBalances(idAccount).map(balance -> ResponseEntity.ok().body(balance));
     }
 
     @Override
-    public Mono<ResponseEntity<Flux<TransactionResponse>>> getClientTransactions(
-            String accountId,
-            ServerWebExchange exchange) {
-        return Mono.fromSupplier(() -> ResponseEntity.ok().body(transactionService.getClientTransactions(accountId)));
+    public Mono<ResponseEntity<Flux<TransactionResponse>>> getAccountIdTransactions(String accountId, ServerWebExchange exchange) {
+        return Mono.fromSupplier(() -> ResponseEntity.ok().body(transactionService.getAccountIdTransactions(accountId)));
     }
 
     @Override
-    public Mono<ResponseEntity<TransactionResponse>> transferToAccount(
-            String accountId,
-            Mono<TransferRequest> transferRequest,
+    public Mono<ResponseEntity<TransactionResponse>> transferToAccount(String accountId, Mono<TransferRequest> transferRequest,
             ServerWebExchange exchange) {
         return transactionService.transferFunds(accountId, transferRequest)
                 .map(transactionResponse -> ResponseEntity.ok().body(transactionResponse));
     }
 
     @Override
-    public Mono<ResponseEntity<AccountResponse>> updateAccount(
-            String idAccount,
-            Mono<AccountRequest> accountRequest,
+    public Mono<ResponseEntity<AccountResponse>> updateAccount(String idAccount, Mono<AccountRequest> accountRequest,
             ServerWebExchange exchange) {
         return bankAccountService.updateAccount(idAccount, accountRequest)
                 .map(accountResponse -> ResponseEntity.ok().body(accountResponse));
     }
 
     @Override
-    public Mono<ResponseEntity<TransactionResponse>> withdrawFromAccount(
-            String idAccount,
-            Mono<WithdrawalRequest> withdrawalRequestMono,
+    public Mono<ResponseEntity<TransactionResponse>> withdrawFromAccount(String idAccount, Mono<WithdrawalRequest> withdrawalRequestMono,
             ServerWebExchange exchange) {
         return transactionService.withdrawFromAccount(idAccount, withdrawalRequestMono)
                 .map(transactionResponse -> ResponseEntity.ok().body(transactionResponse));

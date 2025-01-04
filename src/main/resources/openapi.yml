@@ -8,7 +8,7 @@ servers:
     description: Local server
 
 paths:
-  /v1/account:
+  /v1/accounts:
     get:
       summary: Get all accounts
       operationId: getAllAccounts
@@ -55,7 +55,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /v1/account/{accountId}:
+  /v1/accounts/{accountId}:
     get:
       summary: Get an account by ID
       operationId: getAccountById
@@ -151,7 +151,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /v1/account/{accountId}/withdrawal:
+  /v1/accounts/{accountId}/withdrawal:
     post:
       summary: Make a withdraw from an account
       operationId: withdrawFromAccount
@@ -187,7 +187,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /v1/account/{accountId}/deposit:
+  /v1/accounts/{accountId}/deposit:
     post:
       summary: Make a deposit to an account
       operationId: depositToAccount
@@ -223,7 +223,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /v1/account/{accountId}/transfer:
+  /v1/accounts/{accountId}/transfer:
     post:
       summary: Make a transfer to an account
       operationId: transferToAccount
@@ -259,7 +259,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /v1/account/{accountId}/balances:
+  /v1/accounts/{accountId}/balances:
     get:
       summary: Get client balances
       operationId: getClientBalances
@@ -288,10 +288,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /v1/account/{accountId}/transactions:
+  /v1/accounts/{accountId}/transactions:
     get:
       summary: Get client transactions
-      operationId: getClientTransactions
+      operationId: getAccountIdTransactions
       parameters:
         - name: accountId
           in: path
@@ -362,7 +362,7 @@ components:
     AccountResponse:
       type: object
       properties:
-        _id:
+        id:
           type: string
         type:
           type: string
@@ -375,7 +375,7 @@ components:
           type: string
           format: date-time
         movementLimit:
-          type: number
+          type: integer
         maintenanceFee:
           type: number
         commissionFee:

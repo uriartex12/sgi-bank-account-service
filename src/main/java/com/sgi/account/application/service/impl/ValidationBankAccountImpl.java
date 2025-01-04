@@ -59,8 +59,7 @@ public class ValidationBankAccountImpl implements ValidationBankAccount {
             return findByClientIdAndType(account.getClientId(), account.getType().name())
                     .flatMap(exists -> exists
                             ? Mono.error(new CustomException(CustomError.E_MAX_SAVINGS_ACCOUNTS_REACHED))
-                            : Mono.just(account)
-                            .doOnNext(a -> a.setMovementLimit(null)));
+                            : Mono.just(account).doOnNext(a -> a.setMovementLimit(null)));
         }
         account.setMovementLimit(null);
         return Mono.just(account);
@@ -119,9 +118,14 @@ public class ValidationBankAccountImpl implements ValidationBankAccount {
 
     private Mono<AccountRequest> handleNonVipPersonalAccount(AccountRequest account) {
         return findByClientIdAndType(account.getClientId(), account.getType().name())
-                .flatMap(exists -> exists
-                        ? Mono.error(new CustomException(CustomError.E_MAX_SAVINGS_ACCOUNTS_REACHED))
-                        : Mono.just(account)
-                        .doOnNext(a -> a.setMaintenanceFee(BigDecimal.ZERO)));
+                .flatMap(exists -> {
+                    if (exists) {
+                        return Mono.error(new CustomException(CustomError.E_MAX_SAVINGS_ACCOUNTS_REACHED));
+                    } else {
+                        return Mono.just(account)
+                                .doOnNext(a -> a.setMaintenanceFee(BigDecimal.ZERO));
+                    }
+                });
     }
+
 }

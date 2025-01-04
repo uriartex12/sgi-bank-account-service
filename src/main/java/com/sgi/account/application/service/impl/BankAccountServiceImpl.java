@@ -6,6 +6,7 @@ import com.sgi.account.domain.model.BankAccount;
 import com.sgi.account.domain.ports.in.BankAccountService;
 import com.sgi.account.domain.ports.out.BankAccountRepository;
 import com.sgi.account.domain.ports.out.FeignExternalService;
+import com.sgi.account.domain.shared.Constants;
 import com.sgi.account.domain.shared.CustomError;
 import com.sgi.account.infrastructure.dto.AccountRequest;
 import com.sgi.account.infrastructure.dto.AccountResponse;
@@ -20,7 +21,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.Random;
 
 /**
  * Service implementation for managing Bank Account.
@@ -53,7 +53,7 @@ public class BankAccountServiceImpl implements BankAccountService {
                                                             : validAccount.getBalance(),
                                                     validAccount.getCurrency()
                                             ));
-                                            bankAccount.setAccountNumber(generateAccountNumber());
+                                            bankAccount.setAccountNumber(Constants.generateAccountNumber());
                                             bankAccount.setCreatedDate(Instant.now());
                                             bankAccount.setUpdatedDate(Instant.now());
                                             bankAccount.setMovementsUsed(BigDecimal.ZERO.intValue());
@@ -76,9 +76,9 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     @Override
     public Mono<Void> deleteAccount(String id) {
-        return bankAccountRepository.findById(id)
-                .flatMap(bankAccountRepository::delete)
-                .switchIfEmpty(Mono.error(new CustomException(CustomError.E_ACCOUNT_NOT_FOUND)));
+         return bankAccountRepository.findById(id)
+                .switchIfEmpty(Mono.error(new CustomException(CustomError.E_ACCOUNT_NOT_FOUND)))
+                .flatMap(bankAccountRepository::delete);
     }
 
     @Override
@@ -89,6 +89,7 @@ public class BankAccountServiceImpl implements BankAccountService {
     @Override
     public Mono<AccountResponse> getAccountById(String id) {
         return bankAccountRepository.findById(id)
+                .switchIfEmpty(Mono.error(new CustomException(CustomError.E_ACCOUNT_NOT_FOUND)))
                 .map(BankAccountMapper.INSTANCE::toAccountResponse);
     }
 
@@ -111,9 +112,5 @@ public class BankAccountServiceImpl implements BankAccountService {
     public Mono<BalanceResponse> getClientBalances(String idAccount) {
         return bankAccountRepository.findById(idAccount)
                 .map(BankAccountMapper.INSTANCE::toBalance);
-    }
-
-    private String generateAccountNumber() {
-        return String.format("%04d00%012d", new Random().nextInt(10000), new Random().nextLong(1000000000000L));
     }
 }

@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.4.1</version>
+		<version>3.3.7</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.sgi</groupId>
@@ -93,7 +93,12 @@
 			<artifactId>reactor-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -120,9 +125,11 @@
 						</goals>
 						<configuration>
 							<excludes>
-								<exclude>**/Application*</exclude>
-								<exclude>**/*MapperImpl*</exclude>
-								<exclude>**/mappers/*</exclude>
+								<exclude>**/BankAccountBackApplication*</exclude>
+								<exclude>**/infrastructure/dto/*</exclude>
+								<exclude>**/infrastructure/mapper/*</exclude>
+								<exclude>**/infrastructure/feign/*</exclude>
+								<exclude>**/domain/shared/*</exclude>
 								<exclude>**/domain/model/**</exclude>
 							</excludes>
 						</configuration>
