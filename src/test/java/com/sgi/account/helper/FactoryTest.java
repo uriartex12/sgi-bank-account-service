@@ -169,30 +169,30 @@ public class FactoryTest {
         return new WithdrawalRequest(100D);
     }
 
-    /**
-     * Creates a new BankAccount object with predefined values for testing purposes.
-     *
-     * @return A BankAccount object populated with random and default values, such as a client ID, balance,
-     *         account type, and other attributes.
-     */
-    public static BankAccount toFactoryEntityBankAccount() {
-        return BankAccount.builder()
-                .id(randomUUID().toString())
-                .accountBalance(Balance.builder()
-                        .balance(BigDecimal.ONE)
-                        .currency("PEN")
-                        .build())
-                .isActive(true)
-                .clientId("client-test-0001")
-                .commissionFee(BigDecimal.valueOf(10))
-                .createdDate(Instant.now())
-                .type("CHECKING")
-                .movementLimit(10)
-                .transactionDay(LocalDate.now())
-                .movementsUsed(0)
-                .holders(List.of("Jhon", "Carlos", "Jose", "Toledo"))
-                .build();
-    }
+        /**
+         * Creates a new BankAccount object with predefined values for testing purposes.
+         *
+         * @return A BankAccount object populated with random and default values, such as a client ID, balance,
+         *         account type, and other attributes.
+         */
+        public static BankAccount toFactoryEntityBankAccount() {
+            return BankAccount.builder()
+                    .id(randomUUID().toString())
+                    .accountBalance(Balance.builder()
+                            .balance(BigDecimal.ONE)
+                            .currency("PEN")
+                            .build())
+                    .isActive(true)
+                    .clientId("client-test-0001")
+                    .commissionFee(BigDecimal.valueOf(10))
+                    .createdDate(Instant.now())
+                    .type("CHECKING")
+                    .movementLimit(10)
+                    .transactionDay(LocalDate.now())
+                    .movementsUsed(0)
+                    .holders(List.of("Jhon", "Carlos", "Jose", "Toledo"))
+                    .build();
+        }
 
     /**
      * Creates a new Customer object with default values for testing purposes.

@@ -40,7 +40,7 @@ public class BankAccountServiceImpl implements BankAccountService {
     public Mono<AccountResponse> createAccount(Mono<AccountRequest> accountRequest) {
         return accountRequest.flatMap(account ->
                 webClient.getMono(
-                                customerServiceUrl.concat("/v1/customers/{id}"),
+                                customerServiceUrl.concat("/v1/customers/{customerId}"),
                                 account.getClientId(),
                                 Customer.class
                         )
