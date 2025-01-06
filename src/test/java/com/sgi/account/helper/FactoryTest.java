@@ -140,21 +140,21 @@ public class FactoryTest {
         return transactionResponse;
     }
 
-    /**
-     * Creates a list of TransactionResponse objects with default values for testing purposes.
-     *
-     * @param productId The product ID to associate with the transaction response.
-     * @return A list containing a single TransactionResponse object with preset values.
-     */
-    public static List<TransactionResponse> toFactoryListTransactionResponse(String productId) {
-        TransactionResponse transactionResponse = new TransactionResponse();
-        transactionResponse.setClientId(randomUUID().toString());
-        transactionResponse.setAmount(BigDecimal.valueOf(100));
-        transactionResponse.setType(TransactionResponse.TypeEnum.DEPOSIT);
-        transactionResponse.setProductId(productId);
-        transactionResponse.setDestinationProductId(null);
-        return List.of(transactionResponse);
-    }
+        /**
+         * Creates a list of TransactionResponse objects with default values for testing purposes.
+         *
+         * @param productId The product ID to associate with the transaction response.
+         * @return A list containing a single TransactionResponse object with preset values.
+         */
+        public static List<TransactionResponse> toFactoryListTransactionResponse(String productId) {
+            TransactionResponse transactionResponse = new TransactionResponse();
+            transactionResponse.setClientId(randomUUID().toString());
+            transactionResponse.setAmount(BigDecimal.valueOf(100));
+            transactionResponse.setType(TransactionResponse.TypeEnum.DEPOSIT);
+            transactionResponse.setProductId(productId);
+            transactionResponse.setDestinationProductId(null);
+            return List.of(transactionResponse);
+        }
 
     /**
      * Creates a new transfer request with a random ID and a specified value.

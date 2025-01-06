@@ -44,7 +44,7 @@ public class TransactionServiceImpl implements TransactionService {
         return bankAccountRepository.findById(idAccount)
                 .switchIfEmpty(Mono.error(new CustomException(CustomError.E_ACCOUNT_NOT_FOUND)))
                 .flatMapMany(credit -> webClient.getFlux(
-                        transactionServiceUrl.concat("/v1/{productId}/transaction"),
+                        transactionServiceUrl.concat("/v1/transactions/{productId}/card"),
                         idAccount,
                         TransactionResponse.class
                 ));
@@ -159,7 +159,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     private Mono<TransactionResponse> postTransaction(TransactionRequest transactionRequest) {
-        return webClient.post(transactionServiceUrl.concat("/v1/transaction"), transactionRequest, TransactionResponse.class);
+        return webClient.post(transactionServiceUrl.concat("/v1/transactions"), transactionRequest, TransactionResponse.class);
     }
 
     private void updateAccountBalance(BankAccount account, BigDecimal updatedBalance) {
