@@ -29,7 +29,7 @@
 	<properties>
 		<java.version>17</java.version>
 		<openapi-generator.version>7.0.0</openapi-generator.version>
-		<spring-cloud.version>2024.0.0</spring-cloud.version>
+		<spring-cloud.version>2023.0.4</spring-cloud.version>
 		<lombok.version>1.18.30</lombok.version>
 		<map-struct.version>1.5.5.Final</map-struct.version>
 		<jackson-nullable.version>0.2.6</jackson-nullable.version>
