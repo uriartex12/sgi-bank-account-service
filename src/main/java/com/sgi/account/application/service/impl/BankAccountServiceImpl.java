@@ -10,8 +10,12 @@ import com.sgi.account.domain.shared.Constants;
 import com.sgi.account.domain.shared.CustomError;
 import com.sgi.account.infrastructure.dto.AccountRequest;
 import com.sgi.account.infrastructure.dto.AccountResponse;
+import com.sgi.account.infrastructure.dto.AccountBalanceResponse;
 import com.sgi.account.infrastructure.dto.BalanceResponse;
+import com.sgi.account.infrastructure.dto.BalanceRequest;
 import com.sgi.account.infrastructure.dto.Customer;
+
+
 import com.sgi.account.infrastructure.exception.CustomException;
 import com.sgi.account.infrastructure.mapper.BankAccountMapper;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +25,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import java.math.BigDecimal;
 import java.time.Instant;
+
+import static com.sgi.account.domain.shared.Constants.COMPLETED;
 
 /**
  * Service implementation for managing Bank Account.
@@ -82,8 +88,8 @@ public class BankAccountServiceImpl implements BankAccountService {
     }
 
     @Override
-    public Flux<AccountResponse> getAllAccounts() {
-        return bankAccountRepository.findAll();
+    public Flux<AccountResponse> getAllAccounts(String clientId, String type, String accountId) {
+        return bankAccountRepository.findAll(clientId, type, accountId);
     }
 
     @Override
@@ -113,4 +119,42 @@ public class BankAccountServiceImpl implements BankAccountService {
         return bankAccountRepository.findById(idAccount)
                 .map(BankAccountMapper.INSTANCE::toBalance);
     }
+
+    @Override
+    public Mono<AccountBalanceResponse> updatedBalanceByAccountId(String action, Mono<BalanceRequest> balanceRequestMono) {
+        return balanceRequestMono.flatMap(balanceRequest ->
+                bankAccountRepository.findById(balanceRequest.getAccountId())
+                        .switchIfEmpty(Mono.defer(() -> Mono.error(new CustomException(CustomError.E_ACCOUNT_NOT_FOUND))))
+                        .flatMap(bankAccount -> processBalanceUpdate(action, balanceRequest, bankAccount))
+        );
+    }
+
+    private Mono<AccountBalanceResponse> processBalanceUpdate(String action, BalanceRequest balanceRequest, BankAccount bankAccount) {
+        return switch (action) {
+            case "deduct" -> processDeduction(balanceRequest, bankAccount);
+            case "add" -> processAddition(balanceRequest, bankAccount);
+            default -> Mono.error(new CustomException(CustomError.E_INVALID_ACTION));
+        };
+    }
+
+    private Mono<AccountBalanceResponse> processDeduction(BalanceRequest balanceRequest, BankAccount bankAccount) {
+        return Mono.just(bankAccount)
+                .filter(account -> account.getAccountBalance().getBalance().compareTo(balanceRequest.getAmount()) >= 0)
+                .switchIfEmpty(Mono.error(new CustomException(CustomError.E_INSUFFICIENT_BALANCE)))
+                .flatMap(account -> updateBalance(account, balanceRequest.getAmount().negate()));
+    }
+
+    private Mono<AccountBalanceResponse> processAddition(BalanceRequest balanceRequest, BankAccount bankAccount) {
+        return updateBalance(bankAccount, balanceRequest.getAmount());
+    }
+
+    private Mono<AccountBalanceResponse> updateBalance(BankAccount bankAccount, BigDecimal amount) {
+        bankAccount.setAccountBalance(Balance.builder()
+                .balance(bankAccount.getAccountBalance().getBalance().add(amount))
+                .currency(bankAccount.getAccountBalance().getCurrency())
+                .build());
+        return bankAccountRepository.save(bankAccount)
+                .map(element -> BankAccountMapper.INSTANCE.toAccountBalance(element, COMPLETED));
+    }
+
 }

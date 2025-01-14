@@ -110,13 +110,13 @@ public class BankAccountServiceImplTest {
     @Test
     void getAllAccounts_shouldReturnListAccountResponse() {
         List<AccountResponse> accounts = FactoryTest.toFactoryListBankAccounts();
-        when(bankAccountRepository.findAll()).thenReturn(Flux.fromIterable(accounts));
-        Flux<AccountResponse> result = bankAccountService.getAllAccounts();
+        when(bankAccountRepository.findAll(anyString(), anyString(), anyString())).thenReturn(Flux.fromIterable(accounts));
+        Flux<AccountResponse> result = bankAccountService.getAllAccounts(anyString(), anyString(), anyString());
 
         StepVerifier.create(result)
                 .expectNextCount(2)
                 .verifyComplete();
-        verify(bankAccountRepository).findAll();
+        verify(bankAccountRepository).findAll(anyString(), anyString(), anyString());
     }
 
     @Test

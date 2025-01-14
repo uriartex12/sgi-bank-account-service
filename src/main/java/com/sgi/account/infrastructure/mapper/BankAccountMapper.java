@@ -1,6 +1,7 @@
 package com.sgi.account.infrastructure.mapper;
 
 import com.sgi.account.domain.model.BankAccount;
+import com.sgi.account.infrastructure.dto.AccountBalanceResponse;
 import com.sgi.account.infrastructure.dto.AccountRequest;
 import com.sgi.account.infrastructure.dto.AccountResponse;
 import com.sgi.account.infrastructure.dto.BalanceResponse;
@@ -28,8 +29,12 @@ public interface BankAccountMapper {
     @Mapping(target = "id", ignore = true)
     BankAccount toAccount(AccountRequest accountRequest);
 
+    @Mapping(target = "accountId", source = "id")
     @Mapping(target = "accountBalance", source = "accountBalance.balance")
     BalanceResponse toBalance(BankAccount bankAccount);
+
+    @Mapping(target = "status", source = "status")
+    AccountBalanceResponse toAccountBalance(AccountResponse accountResponse, String status);
 
     default OffsetDateTime map(Instant instant) {
         return instant != null ? instant.atOffset(ZoneOffset.UTC) : null;

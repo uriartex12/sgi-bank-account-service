@@ -12,6 +12,25 @@ paths:
     get:
       summary: Get all accounts
       operationId: getAllAccounts
+      parameters:
+        - name: clientId
+          in: query
+          required: false
+          description: Id of client
+          schema:
+            type: string
+        - name: type
+          in: query
+          required: false
+          description: type
+          schema:
+            type: string
+        - name: accountId
+          in: query
+          required: false
+          description: Id of account
+          schema:
+            type: string
       responses:
         '200':
           description: List of accounts
@@ -259,6 +278,41 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /v1/accounts/balance/{action}:
+    post:
+      summary: Make a transfer to an account
+      operationId: handleBalanceAction
+      parameters:
+        - name: action
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BalanceRequest'
+      responses:
+        '200':
+          description: Balance adjusted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountBalanceResponse'
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Insufficient balance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /v1/accounts/{accountId}/balances:
     get:
       summary: Get client balances
@@ -468,10 +522,36 @@ components:
     BalanceResponse:
       type: object
       properties:
+        accountId:
+          type: string
         clientId:
           type: string
         accountBalance:
-          type: number
+          type: decimal
+    BalanceRequest:
+      type: object
+      properties:
+        accountId:
+          type: string
+        amount:
+          type: decimal
+    AccountBalanceResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [ savings, checking, fixed term ]
+        balance:
+          type: object
+        status:
+          type: string
+          enum: [ COMPLETED, FAILED ]
+        accountNumber:
+          type: string
+        clientId:
+          type: string
     ErrorResponse:
       type: object
       required:

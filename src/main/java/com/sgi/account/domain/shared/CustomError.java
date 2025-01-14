@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 public enum CustomError {
 
     E_OPERATION_FAILED(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, "ACCOUNT-000", "Operation failed")),
+    E_INVALID_ACTION(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, "ACCOUNT-0014", "Action invalid")),
     E_MISSING_CREDIT_CARD(new ApiError(HttpStatus.NOT_FOUND, "ACCOUNT-102", "Missing credit card")),
     E_ACCOUNT_NOT_FOUND(new ApiError(HttpStatus.NOT_FOUND, "ACCOUNT-001", "Bank account not found")),
     E_INSUFFICIENT_BALANCE(new ApiError(HttpStatus.PAYMENT_REQUIRED, "ACCOUNT-004", "Insufficient balance")),

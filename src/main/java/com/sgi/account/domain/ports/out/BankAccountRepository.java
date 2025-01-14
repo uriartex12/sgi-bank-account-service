@@ -16,7 +16,7 @@ public interface BankAccountRepository {
 
     Mono<BankAccount> findById(String id);
 
-    Flux<AccountResponse> findAll();
+    Flux<AccountResponse> findAll(String clientId, String type, String accountId);
 
     Mono<Void> delete(BankAccount bankAccount);
 

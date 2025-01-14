@@ -11,6 +11,9 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
+import java.util.stream.Stream;
+
 /**
  * Implementation of the {@link BankAccountRepository} interface.
  * Provides operations for managing bank accounts using a JPA-based repository.
@@ -40,9 +43,11 @@ public class BankAccountRepositoryImpl implements BankAccountRepository {
     }
 
     @Override
-    public Flux<AccountResponse> findAll() {
-        return repositoryJpa.findAll()
-               .map(BankAccountMapper.INSTANCE::toAccountResponse);
+    public Flux<AccountResponse> findAll(String clientId, String type, String accountId) {
+        boolean allNull = Stream.of(clientId, type, accountId).allMatch(Objects::isNull);
+        Flux<BankAccount> resultFlux = allNull
+                ? repositoryJpa.findAll() : repositoryJpa.findAllByClientIdOrTypeOrId(clientId, type, accountId);
+        return resultFlux.map(BankAccountMapper.INSTANCE::toAccountResponse);
     }
 
     @Override

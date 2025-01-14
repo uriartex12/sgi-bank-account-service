@@ -5,11 +5,12 @@ import com.sgi.account.domain.ports.in.TransactionService;
 import com.sgi.account.infrastructure.dto.AccountRequest;
 import com.sgi.account.infrastructure.dto.AccountResponse;
 import com.sgi.account.infrastructure.dto.DepositRequest;
-import com.sgi.account.infrastructure.dto.TransactionResponse;
 import com.sgi.account.infrastructure.dto.BalanceResponse;
+import com.sgi.account.infrastructure.dto.BalanceRequest;
+import com.sgi.account.infrastructure.dto.AccountBalanceResponse;
+import com.sgi.account.infrastructure.dto.TransactionResponse;
 import com.sgi.account.infrastructure.dto.TransferRequest;
 import com.sgi.account.infrastructure.dto.WithdrawalRequest;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,6 @@ public class BanckAccountController implements V1Api {
     private final TransactionService transactionService;
 
     @Override
-    @CircuitBreaker(name = "account-service", fallbackMethod = "getAllAccounts")
     public Mono<ResponseEntity<AccountResponse>> createAccount(Mono<AccountRequest> accountRequest, ServerWebExchange exchange) {
         return bankAccountService.createAccount(accountRequest)
                 .map(bankAccount
@@ -44,7 +44,7 @@ public class BanckAccountController implements V1Api {
 
     @Override
     public Mono<ResponseEntity<TransactionResponse>> depositToAccount(String idAccount, Mono<DepositRequest> depositRequestMono,
-            ServerWebExchange exchange) {
+                                                                      ServerWebExchange exchange) {
         return transactionService.depositToAccount(idAccount, depositRequestMono)
                 .map(bankAccount -> ResponseEntity.ok().body(bankAccount));
     }
@@ -56,18 +56,24 @@ public class BanckAccountController implements V1Api {
     }
 
     @Override
-    public Mono<ResponseEntity<Flux<AccountResponse>>> getAllAccounts(ServerWebExchange exchange) {
-        return Mono.fromSupplier(() -> ResponseEntity.ok().body(bankAccountService.getAllAccounts()));
-    }
-
-    @Override
     public Mono<ResponseEntity<BalanceResponse>> getClientBalances(String idAccount, ServerWebExchange exchange) {
         return bankAccountService.getClientBalances(idAccount).map(balance -> ResponseEntity.ok().body(balance));
     }
 
     @Override
+    public Mono<ResponseEntity<AccountBalanceResponse>> handleBalanceAction(String action, Mono<BalanceRequest> balanceRequest, ServerWebExchange exchange) {
+        return bankAccountService.updatedBalanceByAccountId(action, balanceRequest)
+                .map(bankAccount -> ResponseEntity.ok().body(bankAccount));
+    }
+
+    @Override
     public Mono<ResponseEntity<Flux<TransactionResponse>>> getAccountIdTransactions(String accountId, ServerWebExchange exchange) {
         return Mono.fromSupplier(() -> ResponseEntity.ok().body(transactionService.getAccountIdTransactions(accountId)));
+    }
+
+    @Override
+    public Mono<ResponseEntity<Flux<AccountResponse>>> getAllAccounts(String clientId, String type, String accountId, ServerWebExchange exchange) {
+        return Mono.fromSupplier(() -> ResponseEntity.ok().body(bankAccountService.getAllAccounts(clientId, type, accountId)));
     }
 
     @Override

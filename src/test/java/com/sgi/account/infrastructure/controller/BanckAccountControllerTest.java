@@ -23,9 +23,12 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
+
 import static java.util.UUID.randomUUID;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 
@@ -100,15 +103,27 @@ public class BanckAccountControllerTest {
 
     @Test
     void getAllAccounts_shouldReturnFluxOfAccountResponse() {
+        String clientId = UUID.randomUUID().toString();
+        String type = "CHECKING";
+        String accountId = UUID.randomUUID().toString();
         List<AccountResponse> accounts =  FactoryTest.toFactoryListBankAccounts();
         Flux<AccountResponse> accountsFlux = Flux.fromIterable(accounts);
-        Mockito.when(bankAccountService.getAllAccounts()).thenReturn(accountsFlux);
+        Mockito.when(bankAccountService.getAllAccounts(clientId, type, accountId)).thenReturn(accountsFlux);
         webTestClient.get()
-                .uri("/v1/accounts")
+                .uri(uriBuilder -> uriBuilder
+                        .path("/v1/accounts")
+                        .queryParam("clientId", clientId)
+                        .queryParam("type", type)
+                        .queryParam("accountId", accountId)
+                        .build())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(AccountResponse.class)
-                .value(list -> assertThat(list).hasSize(2));
+                .consumeWith(response -> {
+                    List<AccountResponse> list = response.getResponseBody();
+                    assertThat(list).isNotNull();
+                    assertThat(list).hasSize(2);
+                });
     }
 
     @Test
