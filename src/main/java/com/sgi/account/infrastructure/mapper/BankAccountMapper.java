@@ -27,6 +27,7 @@ public interface BankAccountMapper {
     AccountResponse toAccountResponse(BankAccount bankAccount);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "type", source = "type")
     BankAccount toAccount(AccountRequest accountRequest);
 
     @Mapping(target = "accountId", source = "id")

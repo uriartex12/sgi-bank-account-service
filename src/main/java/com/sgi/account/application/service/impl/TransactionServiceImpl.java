@@ -117,9 +117,9 @@ public class TransactionServiceImpl implements TransactionService {
         return bankAccountRepository.findById(idAccount)
                 .switchIfEmpty(Mono.defer(() -> Mono.error(new CustomException(CustomError.E_ACCOUNT_NOT_FOUND))))
                 .flatMap(account -> transferRequest
-                        .filter(transfer -> account.getAccountBalance().getBalance()
-                                .compareTo(BigDecimal.valueOf(transfer.getAmount())) >= 0)
-                        .switchIfEmpty(Mono.error(new CustomException(CustomError.E_INSUFFICIENT_BALANCE)))
+                            .filter(transfer -> account.getAccountBalance().getBalance()
+                                    .compareTo(BigDecimal.valueOf(transfer.getAmount())) >= 0)
+                            .switchIfEmpty(Mono.error(new CustomException(CustomError.E_INSUFFICIENT_BALANCE)))
                         .flatMap(transfer -> bankAccountRepository.findById(transfer.getDestinationProductId())
                                 .switchIfEmpty(Mono.defer(() -> Mono.error(new CustomException(CustomError.E_ACCOUNT_NOT_FOUND))))
                                 .flatMap(accountDestination -> {
@@ -133,7 +133,6 @@ public class TransactionServiceImpl implements TransactionService {
                                             account.getId(), DEPOSIT, originalBalanceDestination
                                                     .add(BigDecimal.valueOf(transfer.getAmount())),
                                             BigDecimal.valueOf(transfer.getAmount()));
-
                                     updateAccountBalance(account, BigDecimal.valueOf(transactionWithdrawal.getBalance()));
                                     updateAccountBalance(accountDestination, BigDecimal.valueOf(transactionDeposit.getBalance()));
                                     return bankAccountRepository.saveAll(Flux.just(account, accountDestination))
@@ -143,7 +142,7 @@ public class TransactionServiceImpl implements TransactionService {
                                                                     postTransaction(transactionDeposit))
                                                             .next()
                                                             .map(results ->
-                                                                    new TransactionResponse(results.getT1().getProductId(),
+                                                                    new TransactionResponse(results.getT1().getId(), results.getT1().getProductId(),
                                                                             results.getT2().getProductId(), results.getT1().getType(),
                                                                             results.getT1().getAmount(), results.getT1().getClientId()))
                                             )

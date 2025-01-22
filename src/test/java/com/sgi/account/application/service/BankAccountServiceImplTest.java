@@ -28,6 +28,7 @@ import java.util.UUID;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -157,13 +158,13 @@ public class BankAccountServiceImplTest {
         AccountResponse accountResponse = BankAccountMapper.INSTANCE.toAccountResponse(bankAccount);
 
         when(bankAccountRepository.findById(accountId)).thenReturn(Mono.just(bankAccount));
-        when(bankAccountRepository.save(bankAccount)).thenReturn(Mono.just(accountResponse));
+        when(bankAccountRepository.save(argThat(account -> account.getId().equals(accountId))))
+                .thenReturn(Mono.just(accountResponse));
         Mono<AccountResponse> result = bankAccountService.updateAccount(accountId, Mono.just(accountRequest));
         StepVerifier.create(result)
                 .expectNext(accountResponse)
                 .verifyComplete();
         verify(bankAccountRepository).findById(accountId);
-        verify(bankAccountRepository).save(bankAccount);
     }
 
     @Test

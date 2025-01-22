@@ -9,8 +9,8 @@ import lombok.AllArgsConstructor;
 import java.math.BigDecimal;
 
 /**
- * Representa el balance de una cuenta bancaria, incluyendo el saldo y la moneda en la que se expresa.
- * Esta clase permite almacenar y manipular el balance de una cuenta, así como la moneda asociada a él.
+ * Represents the balance of a bank account, including the balance and the currency in which it is expressed.
+ * This class allows you to store and manipulate the balance of an account, as well as the currency associated with it.
  */
 @Getter
 @Setter
@@ -22,12 +22,4 @@ public class Balance {
     private BigDecimal balance;
     private String currency;
 
-    /**
-     * Constructor para crear un Balance con un saldo específico.
-     *
-     * @param balance El saldo de la cuenta.
-     */
-    public Balance(BigDecimal balance) {
-        this.balance = balance;
-    }
 }

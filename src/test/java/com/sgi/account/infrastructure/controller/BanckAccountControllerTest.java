@@ -28,7 +28,6 @@ import java.util.UUID;
 import static java.util.UUID.randomUUID;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 
@@ -132,7 +131,7 @@ public class BanckAccountControllerTest {
         BalanceResponse balanceResponse = FactoryTest.toFactoryBalanceClient();
         Mockito.when(bankAccountService.getClientBalances(idAccount)).thenReturn(Mono.just(balanceResponse));
         webTestClient.get()
-                .uri("/v1/accounts/{accountId}/balances", idAccount)
+                .uri("/v1/accounts/{accountId}/balance", idAccount)
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)

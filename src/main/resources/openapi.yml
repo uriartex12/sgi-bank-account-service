@@ -313,7 +313,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /v1/accounts/{accountId}/balances:
+  /v1/accounts/{accountId}/balance:
     get:
       summary: Get client balances
       operationId: getClientBalances
@@ -381,7 +381,7 @@ components:
       properties:
         type:
           type: string
-          enum: [savings, checking, fixed term]
+          enum: [SAVINGS, CHECKING, FIXED_TERM]
         balance:
           type: number
         currency:
@@ -420,7 +420,7 @@ components:
           type: string
         type:
           type: string
-          enum: [savings, checking, fixed term]
+          enum: [SAVINGS, CHECKING, FIXED_TERM]
         balance:
           type: object
         accountNumber:
@@ -502,12 +502,15 @@ components:
     TransactionResponse:
       type: object
       required:
+        - id
         - productId
         - destinationProductId
         - type
         - amount
         - clientId
       properties:
+        id:
+          type: string
         productId:
           type: string
         destinationProductId:
@@ -542,7 +545,7 @@ components:
           type: string
         type:
           type: string
-          enum: [ savings, checking, fixed term ]
+          enum: [SAVINGS, CHECKING, FIXED_TERM]
         balance:
           type: object
         status:

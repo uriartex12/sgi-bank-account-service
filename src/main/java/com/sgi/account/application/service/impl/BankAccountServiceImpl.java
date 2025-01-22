@@ -105,11 +105,10 @@ public class BankAccountServiceImpl implements BankAccountService {
                 .switchIfEmpty(Mono.error(new CustomException(CustomError.E_ACCOUNT_NOT_FOUND)))
                 .flatMap(account ->
                         bankAccount.map(updatedAccount -> {
-                            account.setType(updatedAccount.getType().getValue());
-                            account.setAuthorizedSigners(updatedAccount.getAuthorizedSigners());
-                            account.setHolders(updatedAccount.getHolders());
-                            account.setUpdatedDate(Instant.now());
-                            return account;
+                            BankAccount updatedEntity = BankAccountMapper.INSTANCE.toAccount(updatedAccount);
+                            updatedEntity.setId(account.getId());
+                            updatedEntity.setUpdatedDate(Instant.now());
+                            return updatedEntity;
                         })
                 ).flatMap(bankAccountRepository::save);
     }

@@ -18,11 +18,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * Representa una cuenta bancaria en el sistema.
- * Esta clase contiene la información relacionada con una cuenta bancaria,
- * incluyendo el número de cuenta, tipo de cuenta, saldo, tarifas de mantenimiento,
- * y otros detalles relevantes de la cuenta.
- * La clase está mapeada a la colección 'bank-account' en la base de datos MongoDB.
+ * Represents a bank account in the system.
+ * This class contains the information related to a bank account,
+ * including the account number, account type, balance, maintenance fees,
+ * and other relevant account details.
+ * The class is mapped to the 'bank-account' collection in the MongoDB database.
  */
 @Getter
 @Setter

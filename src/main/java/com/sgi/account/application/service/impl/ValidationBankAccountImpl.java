@@ -88,7 +88,7 @@ public class ValidationBankAccountImpl implements ValidationBankAccount {
     }
 
     private Mono<AccountRequest> checkCreditCardForClient(AccountRequest account, String clientId) {
-        return webClient.getFlux(creditServiceUrl.concat("v1/credits/{clientId}/card"), clientId, Credit.class)
+        return webClient.getFlux(creditServiceUrl.concat("/v1/credits/{clientId}/card"), clientId, Credit.class)
                 .collectList()
                 .filter(creditResponses -> !creditResponses.isEmpty())
                 .switchIfEmpty(Mono.error(new CustomException(CustomError.E_MISSING_CREDIT_CARD)))
